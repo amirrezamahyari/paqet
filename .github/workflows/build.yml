@@ -270,15 +270,34 @@ jobs:
                   SDK_DIR="$(ls -d openwrt-sdk-23.05.2-mediatek-mt7622_* | head -n1)"
                   echo "SDK_DIR=$SDK_DIR" >> $GITHUB_ENV
 
-            - name: Build libpcap inside SDK (populates sysroot headers/libs)
+            - name: Cross-compile libpcap for OpenWrt target
               shell: bash
               run: |
                   set -e
                   cd "$SDK_DIR"
-                  ./scripts/feeds update -a
-                  ./scripts/feeds install -a
-                  make defconfig
-                  make package/libs/libpcap/compile V=s
+                  STAGING="$PWD/staging_dir"
+                  TOOLCHAIN="$(ls -d $STAGING/toolchain-* | head -n1)"
+                  TARGETSYS="$(ls -d $STAGING/target-* | head -n1)"
+                  export PATH="$TOOLCHAIN/bin:$PATH"
+                  GCC_PATH="$(ls "$TOOLCHAIN/bin/"*-openwrt-linux-musl-gcc | head -n1)"
+                  [ -x "$GCC_PATH" ] || { echo "Error: no musl-gcc found in $TOOLCHAIN/bin"; exit 1; }
+                  CROSS_PREFIX="$(basename "$GCC_PATH" | sed 's/-gcc$//')"
+
+                  LIBPCAP_VER=1.10.4
+                  LIBPCAP_SHA256=b5729e2d71b2221f602e8ffb578a764546ef54d39191b512f67370bb3b824635
+                  wget -q -O libpcap-${LIBPCAP_VER}.tar.gz \
+                    "https://www.tcpdump.org/release/libpcap-${LIBPCAP_VER}.tar.gz"
+                  echo "$LIBPCAP_SHA256  libpcap-${LIBPCAP_VER}.tar.gz" | sha256sum -c -
+                  tar xzf libpcap-${LIBPCAP_VER}.tar.gz
+                  cd libpcap-${LIBPCAP_VER}
+
+                  ./configure \
+                    --host="$CROSS_PREFIX" \
+                    --prefix="$TARGETSYS/usr" \
+                    --with-pcap=linux \
+                    --without-libnl
+                  make -j"$(nproc)"
+                  make install
 
             - name: Build paqet for OpenWrt (arm64 + musl)
               shell: bash
