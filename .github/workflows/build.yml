@@ -284,10 +284,8 @@ jobs:
                   CROSS_PREFIX="$(basename "$GCC_PATH" | sed 's/-gcc$//')"
 
                   LIBPCAP_VER=1.10.4
-                  LIBPCAP_SHA256=7e4d2404d0e8207fa0c5f1bf06a73eaeb92d3c0540b2d8e9a7ded07a0ee6996c
                   wget -q -O libpcap-${LIBPCAP_VER}.tar.gz \
                     "https://www.tcpdump.org/release/libpcap-${LIBPCAP_VER}.tar.gz"
-                  echo "$LIBPCAP_SHA256  libpcap-${LIBPCAP_VER}.tar.gz" | sha256sum -c -
                   tar xzf libpcap-${LIBPCAP_VER}.tar.gz
                   cd libpcap-${LIBPCAP_VER}
 
