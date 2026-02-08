@@ -1,0 +1,11 @@
+{
+  "luci-app-paqet": {
+    "description": "Grant UCI access for luci-app-paqet",
+    "read": {
+      "uci": [ "paqet" ]
+    },
+    "write": {
+      "uci": [ "paqet" ]
+    }
+  }
+}

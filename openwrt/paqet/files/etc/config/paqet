@@ -1,0 +1,51 @@
+config paqet 'main'
+	option enabled '0'
+
+	# devices = per-device default
+	# all     = force all LAN traffic into tunnel
+	option mode 'devices'
+
+	# paqet client SOCKS listen (used by sing-box outbound)
+	option socks_listen '127.0.0.1:1080'
+
+	# paqet remote server (your VPS server running paqet in server role)
+	option server_addr 'YOUR_VPS_IP_OR_HOST:9999'
+
+	# KCP key (must match server)
+	option key 'CHANGE_ME'
+	option block 'aes'
+	option conn '1'
+
+	# paqet raw network params (leave blank to auto-detect on start)
+	option wan_iface ''
+	option local_ip ''
+	option gateway_mac ''
+	option local_port '9999'
+
+	# logging
+	option log_level 'info'          # paqet log level
+	option singbox_log_level 'warn'  # sing-box log level
+
+	# TUN settings
+	option tun_ifname 'paqet0'
+	option tun_mtu '1500'
+	option tun_inet4 '198.18.0.1/30'
+	option tun_inet6 'fd00:198:18::1/126'
+
+	# policy routing
+	option fwmark '0x1'
+	option routing_table '100'
+
+	# interfaces to mark (only used in mode=all)
+	# default br-lan covers typical Wi-Fi + LAN bridge
+	list lan_iif 'br-lan'
+
+	# sing-box binary path
+	option singbox_bin '/usr/bin/sing-box'
+
+
+# Example per-device entry (client IP must be static DHCP lease!)
+config device
+	option enabled '0'
+	option name 'phone'
+	option ip '192.168.1.123'

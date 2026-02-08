@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+# Add a firewall include for fw4 (nftables) if missing
+if ! uci -q show firewall | grep -q "/usr/share/paqet/fw4.include"; then
+	uci add firewall include >/dev/null
+	uci set firewall.@include[-1].path="/usr/share/paqet/fw4.include"
+	uci set firewall.@include[-1].type="script"
+	uci set firewall.@include[-1].reload="1"
+	uci set firewall.@include[-1].enabled="1"
+	uci commit firewall
+fi
+
+exit 0

@@ -1,0 +1,4 @@
+#!/bin/sh
+# firewall4 include hook
+/usr/share/paqet/rules.sh nft 2>/dev/null || true
+exit 0
